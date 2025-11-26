@@ -86,35 +86,40 @@
         throw err;
       }
 
+      const h = React.createElement;
+
       function Card({ title, copy, options }) {
-        return (
-          <ReactGlass className="glass-pane" options={options}>
-            <div className="pill">reactGlass</div>
-            <h2>{title}</h2>
-            <p>{copy}</p>
-          </ReactGlass>
+        return h(
+          ReactGlass,
+          { className: "glass-pane", options },
+          h("div", { className: "pill" }, "reactGlass"),
+          h("h2", null, title),
+          h("p", null, copy)
         );
       }
 
       const root = createRoot(rootEl);
       root.render(
-        <div className="grid">
-          <Card
-            title="Default Blend"
-            copy="A balanced bevel with subtle frost and animated highlights."
-            options={{}}
-          />
-          <Card
-            title="Tilt + Specular"
-            copy="Enable tilt interactions and higher refraction for a lively card."
-            options={{ tilt: true, tiltFactor: 8, refraction: 0.03, specular: true }}
-          />
-          <Card
-            title="Frosted Privacy"
-            copy="Higher frost and soft shadow for UI overlays or modals."
-            options={{ frost: 3, shadow: true, bevelWidth: 0.22, bevelDepth: 0.05 }}
-          />
-        </div>
+        h(
+          "div",
+          { className: "grid" },
+          h(Card, {
+            title: "Default Blend",
+            copy: "A balanced bevel with subtle frost and animated highlights.",
+            options: {},
+          }),
+          h(Card, {
+            title: "Tilt + Specular",
+            copy:
+              "Enable tilt interactions and higher refraction for a lively card.",
+            options: { tilt: true, tiltFactor: 8, refraction: 0.03, specular: true },
+          }),
+          h(Card, {
+            title: "Frosted Privacy",
+            copy: "Higher frost and soft shadow for UI overlays or modals.",
+            options: { frost: 3, shadow: true, bevelWidth: 0.22, bevelDepth: 0.05 },
+          })
+        )
       );
     </script>
   </body>

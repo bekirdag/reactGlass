@@ -86,37 +86,43 @@
         throw err;
       }
 
+      const h = React.createElement;
+
       function FeatureBlock({ title, copy, options }) {
         const ref = useReactGlass(options, [options]);
-        return (
-          <div ref={ref} className="glass-block">
-            <div className="badge">Hook</div>
-            <h3>{title}</h3>
-            <p>{copy}</p>
-            <a className="cta" href="#">Learn more →</a>
-          </div>
+        return h(
+          "div",
+          { ref, className: "glass-block" },
+          h("div", { className: "badge" }, "Hook"),
+          h("h3", null, title),
+          h("p", null, copy),
+          h("a", { className: "cta", href: "#" }, "Learn more →")
         );
       }
 
       const root = createRoot(rootEl);
       root.render(
-        <div className="shell">
-          <FeatureBlock
-            title="Live Tilt"
-            copy="Tilt-enabled block with a deeper bevel and animated specular highlights."
-            options={{ tilt: true, tiltFactor: 9, bevelDepth: 0.14, specular: true }}
-          />
-          <FeatureBlock
-            title="Frosted HUD"
-            copy="Softer bevel, increased frost, and shadow for overlay panels."
-            options={{ frost: 4, bevelWidth: 0.2, bevelDepth: 0.05, shadow: true }}
-          />
-          <FeatureBlock
-            title="Lens Focus"
-            copy="Higher refraction and magnification to spotlight background motion."
-            options={{ refraction: 0.04, magnify: 1.12, specular: false }}
-          />
-        </div>
+        h(
+          "div",
+          { className: "shell" },
+          h(FeatureBlock, {
+            title: "Live Tilt",
+            copy:
+              "Tilt-enabled block with a deeper bevel and animated specular highlights.",
+            options: { tilt: true, tiltFactor: 9, bevelDepth: 0.14, specular: true },
+          }),
+          h(FeatureBlock, {
+            title: "Frosted HUD",
+            copy: "Softer bevel, increased frost, and shadow for overlay panels.",
+            options: { frost: 4, bevelWidth: 0.2, bevelDepth: 0.05, shadow: true },
+          }),
+          h(FeatureBlock, {
+            title: "Lens Focus",
+            copy:
+              "Higher refraction and magnification to spotlight background motion.",
+            options: { refraction: 0.04, magnify: 1.12, specular: false },
+          })
+        )
       );
     </script>
   </body>
