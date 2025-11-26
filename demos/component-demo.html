@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>reactGlass – Component Demo</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at 20% 20%, #0d1b3a 0%, #050911 40%),
+          radial-gradient(circle at 80% 0%, #1e3a8a 0%, #050911 35%),
+          linear-gradient(160deg, #0b1225, #04060d);
+        min-height: 100vh;
+        color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+        box-sizing: border-box;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 24px;
+        width: min(1100px, 100%);
+      }
+
+      .glass-pane {
+        position: relative;
+        padding: 20px;
+        border-radius: 24px;
+        color: #f1f5f9;
+        letter-spacing: 0.01em;
+        backdrop-filter: blur(2px);
+      }
+
+      h2 {
+        margin: 0 0 8px;
+        font-size: 22px;
+        letter-spacing: 0.02em;
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.5;
+        color: #cbd5e1;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        color: #93c5fd;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="module">
+      import React from "https://esm.sh/react@18";
+      import { createRoot } from "https://esm.sh/react-dom@18/client";
+      import { LiquidGlass } from "../dist/index.js";
+
+      function Card({ title, copy, options }) {
+        return (
+          <LiquidGlass className="glass-pane" options={options}>
+            <div className="pill">reactGlass</div>
+            <h2>{title}</h2>
+            <p>{copy}</p>
+          </LiquidGlass>
+        );
+      }
+
+      const root = createRoot(document.getElementById("root"));
+      root.render(
+        <div className="grid">
+          <Card
+            title="Default Blend"
+            copy="A balanced bevel with subtle frost and animated highlights."
+            options={{}}
+          />
+          <Card
+            title="Tilt + Specular"
+            copy="Enable tilt interactions and higher refraction for a lively card."
+            options={{ tilt: true, tiltFactor: 8, refraction: 0.03, specular: true }}
+          />
+          <Card
+            title="Frosted Privacy"
+            copy="Higher frost and soft shadow for UI overlays or modals."
+            options={{ frost: 3, shadow: true, bevelWidth: 0.22, bevelDepth: 0.05 }}
+          />
+        </div>
+      );
+    </script>
+  </body>
+</html>
