@@ -5,19 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>reactGlass – Component Demo</title>
     <style>
+      /* Place the requested image at demos/assets/background.jpg to avoid CORS issues. */
       body {
         margin: 0;
         font-family: "Inter", system-ui, -apple-system, sans-serif;
-        background: radial-gradient(circle at 20% 20%, #0d1b3a 0%, #050911 40%),
-          radial-gradient(circle at 80% 0%, #1e3a8a 0%, #050911 35%),
-          linear-gradient(160deg, #0b1225, #04060d);
+        background:
+          linear-gradient(120deg, rgba(10, 18, 35, 0.9), rgba(6, 10, 20, 0.92)),
+          url("./assets/background.jpg") center/cover fixed no-repeat;
         min-height: 100vh;
         color: #e5e7eb;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 48px;
+        padding: 48px 24px 96px;
         box-sizing: border-box;
+        overflow-y: auto;
       }
 
       .grid {
@@ -62,27 +61,200 @@
         margin-bottom: 12px;
         border: 1px solid rgba(255, 255, 255, 0.05);
       }
+
+      .glass-shell {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(1100px, 100%);
+        z-index: 5;
+        pointer-events: none;
+      }
+
+      .glass-shell .glass-pane {
+        pointer-events: auto;
+      }
+
+      .content {
+        position: relative;
+        z-index: 1;
+        width: min(1100px, 100%);
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 64px;
+      }
+
+      .section {
+        padding: 32px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(6px);
+        color: #dbeafe;
+      }
+
+      .section h3 {
+        margin: 0 0 12px;
+        letter-spacing: 0.04em;
+      }
+
+      .section.neon {
+        background: linear-gradient(140deg, rgba(99, 102, 241, 0.14), rgba(34, 211, 238, 0.12));
+        border-color: rgba(99, 102, 241, 0.3);
+      }
+
+      .section.sunset {
+        background: linear-gradient(160deg, rgba(251, 191, 36, 0.16), rgba(244, 114, 182, 0.12));
+        border-color: rgba(251, 191, 36, 0.25);
+      }
+
+      .section.ember {
+        background: linear-gradient(120deg, rgba(248, 113, 113, 0.14), rgba(251, 146, 60, 0.14));
+        border-color: rgba(248, 113, 113, 0.28);
+      }
+
+      .section.midnight {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(30, 41, 59, 0.65));
+        border-color: rgba(59, 130, 246, 0.24);
+      }
+
+      .section.serif h3 {
+        font-family: "Georgia", "Times New Roman", serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .section.mono h3 {
+        font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+        letter-spacing: 0.1em;
+      }
+
+      .pill-lite {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      #blob-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -3;
+        filter: blur(18px) saturate(120%);
+        opacity: 0.8;
+      }
     </style>
   </head>
   <body>
     <div id="root"></div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@18",
+          "react/jsx-runtime": "https://esm.sh/react@18/jsx-runtime"
+        }
+      }
+    </script>
+
     <script type="module">
       import React from "https://esm.sh/react@18";
       import { createRoot } from "https://esm.sh/react-dom@18/client";
 
+      function startBlobBackground() {
+        const canvas = document.createElement("canvas");
+        canvas.id = "blob-canvas";
+        document.body.prepend(canvas);
+        const ctx = canvas.getContext("2d");
+        const palette = ["#2dd4bf", "#6366f1", "#f472b6", "#22d3ee", "#c084fc"];
+        const blobs = Array.from({ length: 8 }).map(() => ({
+          x: Math.random(),
+          y: Math.random(),
+          r: 120 + Math.random() * 160,
+          vx: (Math.random() * 0.6 - 0.3) * 0.0007,
+          vy: (Math.random() * 0.6 - 0.3) * 0.0007,
+          color: palette[Math.floor(Math.random() * palette.length)],
+        }));
+
+        let dpr = window.devicePixelRatio || 1;
+        const resize = () => {
+          dpr = window.devicePixelRatio || 1;
+          canvas.width = innerWidth * dpr;
+          canvas.height = innerHeight * dpr;
+          canvas.style.width = "100%";
+          canvas.style.height = "100%";
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+        resize();
+        window.addEventListener("resize", resize, { passive: true });
+
+        const tick = () => {
+          ctx.clearRect(0, 0, innerWidth, innerHeight);
+          blobs.forEach((b, i) => {
+            b.x += b.vx;
+            b.y += b.vy;
+            if (b.x < 0 || b.x > 1) b.vx *= -1;
+            if (b.y < 0 || b.y > 1) b.vy *= -1;
+            const cx = b.x * innerWidth;
+            const cy = b.y * innerHeight;
+            const grad = ctx.createRadialGradient(
+              cx,
+              cy,
+              b.r * 0.15,
+              cx,
+              cy,
+              b.r
+            );
+            grad.addColorStop(0, `${b.color}dd`);
+            grad.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.globalCompositeOperation = i % 2 === 0 ? "screen" : "lighter";
+            ctx.beginPath();
+            ctx.fillStyle = grad;
+            ctx.arc(cx, cy, b.r, 0, Math.PI * 2);
+            ctx.fill();
+          });
+          ctx.globalCompositeOperation = "source-over";
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+
+      startBlobBackground();
+
       const rootEl = document.getElementById("root");
+
+      async function loadReactGlass() {
+        const attempts = ["../dist/index.js", "../dist/reactGlass.js"];
+        for (const path of attempts) {
+          try {
+            const mod = await import(path);
+            if (mod.ReactGlass) return mod.ReactGlass;
+          } catch (e) {
+            // ignore and try next
+          }
+        }
+        throw new Error("ReactGlass export missing from dist build");
+      }
 
       let ReactGlass;
       try {
-        ({ ReactGlass } = await import("../dist/reactGlass.js"));
+        ReactGlass = await loadReactGlass();
       } catch (err) {
-        console.error(
-          "Could not load reactGlass build. Run `npm install && npm run build` in /reactGlass to generate dist/",
-          err
-        );
+        console.error("Could not load reactGlass build.", err);
         rootEl.innerHTML =
-          "<p style='color:#e2e8f0;font-family:system-ui,sans-serif'>Build reactGlass first: <code>cd reactGlass && npm install && npm run build</code></p>";
+          "<p style='color:#e2e8f0;font-family:system-ui,sans-serif'>Build reactGlass first: <code>cd reactGlass && npm install && npm run build</code>. Ensure you are serving from the <code>reactGlass</code> folder so <code>dist/</code> is reachable.</p>";
         throw err;
       }
 
@@ -99,28 +271,121 @@
       }
 
       const root = createRoot(rootEl);
+      const sections = [
+        {
+          title: "Shifting Nebula",
+          copy:
+            "Observe how the lenses warp the drifting blobs and gradient layers behind them. This section scrolls underneath the fixed glass grid.",
+          className: "section neon",
+        },
+        {
+          title: "Ink in Water",
+          copy:
+            "Slow-moving paint-like blobs highlight refraction and frost. Scroll to see how motion continues behind the glass.",
+          className: "section midnight serif",
+        },
+        {
+          title: "Layered Depth",
+          copy:
+            "Multiple color fields blend via additive compositing. The bevel and frost exaggerate parallax as you move the page.",
+          className: "section sunset mono",
+        },
+        {
+          title: "Lumen Trails",
+          copy:
+            "Bright streaks over deep blues accentuate refraction edges. Tilt the cards to watch specular highlights track across them.",
+          className: "section ember",
+        },
+        {
+          title: "Chromatic Field",
+          copy:
+            "High-saturation blobs plus frost yield soft diffusion. Note how edges stay crisp while internals bloom.",
+          className: "section neon mono",
+        },
+        {
+          title: "Glass + Typography",
+          copy:
+            "Alternate type systems (serif, mono) behind the glass to check legibility across weights and styles.",
+          className: "section sunset serif",
+        },
+        {
+          title: "Motion Parallax",
+          copy:
+            "Scroll slowly and watch the background blobs drift independently of the glass layer for a layered depth feel.",
+          className: "section midnight",
+        },
+      ];
+
       root.render(
         h(
-          "div",
-          { className: "grid" },
-          h(Card, {
-            title: "Default Blend",
-            copy: "A balanced bevel with subtle frost and animated highlights.",
-            options: {},
-          }),
-          h(Card, {
-            title: "Tilt + Specular",
-            copy:
-              "Enable tilt interactions and higher refraction for a lively card.",
-            options: { tilt: true, tiltFactor: 8, refraction: 0.03, specular: true },
-          }),
-          h(Card, {
-            title: "Frosted Privacy",
-            copy: "Higher frost and soft shadow for UI overlays or modals.",
-            options: { frost: 3, shadow: true, bevelWidth: 0.22, bevelDepth: 0.05 },
-          })
+          React.Fragment,
+          null,
+          h(
+            "div",
+            { className: "glass-shell" },
+            h(
+              "div",
+              { className: "grid" },
+              h(Card, {
+                title: "Default Blend",
+                copy: "Balanced bevel, subtle frost, animated highlights.",
+                options: { frost: 2, refraction: 0.02, bevelDepth: 0.08 },
+              }),
+              h(Card, {
+                title: "Tilt + Specular",
+                copy: "Tilt-enabled with higher refraction and specular shimmer.",
+                options: {
+                  tilt: true,
+                  tiltFactor: 10,
+                  refraction: 0.05,
+                  bevelDepth: 0.12,
+                  specular: true,
+                },
+              }),
+              h(Card, {
+                title: "Frosted Privacy",
+                copy: "Higher frost and soft shadow for modal-like overlays.",
+                options: {
+                  frost: 4,
+                  shadow: true,
+                  bevelWidth: 0.22,
+                  bevelDepth: 0.05,
+                  refraction: 0.015,
+                },
+              })
+            )
+          ),
+          h(
+            "div",
+            { className: "content" },
+            sections.map((s, i) =>
+              h(
+                "div",
+                { key: i, className: s.className || "section" },
+                h("div", { className: "pill-lite" }, "Behind Glass"),
+                h("h3", null, s.title),
+                h("p", null, s.copy),
+                h(
+                  "p",
+                  null,
+                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae sem vitae libero hendrerit varius. Curabitur porta, arcu vitae mattis viverra, nisl leo faucibus nunc, non bibendum nisi lectus vitae arcu."
+                )
+              )
+            )
+          )
         )
       );
+
+      // If capture fails for any reason, force content visible after a short delay.
+      setTimeout(() => {
+        document.querySelectorAll(".glass-pane").forEach((el) => {
+          const opacity = parseFloat(getComputedStyle(el).opacity || "0");
+          if (opacity < 0.01) {
+            el.style.opacity = "1";
+            el.style.pointerEvents = "auto";
+          }
+        });
+      }, 1200);
     </script>
   </body>
 </html>

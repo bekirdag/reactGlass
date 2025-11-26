@@ -10,6 +10,6 @@ export {
   type ReactGlassRevealMode,
   type ReactGlassTarget,
   type ReactGlassInstance,
-} from "./reactGlass";
+} from "./reactGlass.js";
 
-export { ReactGlass, useReactGlass, type ReactGlassProps } from "./react";
+export { ReactGlass, useReactGlass, type ReactGlassProps } from "./react.js";

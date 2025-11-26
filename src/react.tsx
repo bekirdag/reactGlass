@@ -11,7 +11,7 @@ import {
   reactGlass,
   type ReactGlassInstance,
   type ReactGlassOptions,
-} from "./reactGlass";
+} from "./reactGlass.js";
 
 function destroyInstance(instance: any) {
   if (!instance) return;

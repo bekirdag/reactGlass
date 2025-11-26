@@ -12,12 +12,13 @@
         --text: #e2e8f0;
       }
       * { box-sizing: border-box; }
+      /* Place the requested image at demos/assets/background.jpg to avoid CORS issues. */
       body {
         margin: 0;
         min-height: 100vh;
-        background: radial-gradient(circle at 10% 20%, rgba(14,165,233,0.2), transparent 40%),
-          radial-gradient(circle at 80% 0%, rgba(99,102,241,0.25), transparent 35%),
-          linear-gradient(135deg, #05070f, #0b1020);
+        background:
+          linear-gradient(135deg, rgba(5,7,15,0.95), rgba(8,12,24,0.9)),
+          url("./assets/background.jpg") center/cover fixed no-repeat;
         font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
         color: var(--text);
         display: grid;
@@ -63,26 +64,119 @@
         transition: transform 0.2s ease, border-color 0.2s ease;
       }
       .cta:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.25); }
+
+      #blob-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -3;
+        filter: blur(18px) saturate(120%);
+        opacity: 0.8;
+      }
     </style>
   </head>
   <body>
     <div id="root"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@18",
+          "react/jsx-runtime": "https://esm.sh/react@18/jsx-runtime"
+        }
+      }
+    </script>
+
     <script type="module">
       import React from "https://esm.sh/react@18";
       import { createRoot } from "https://esm.sh/react-dom@18/client";
 
+      function startBlobBackground() {
+        const canvas = document.createElement("canvas");
+        canvas.id = "blob-canvas";
+        document.body.prepend(canvas);
+        const ctx = canvas.getContext("2d");
+        const palette = ["#2dd4bf", "#6366f1", "#f472b6", "#22d3ee", "#c084fc"];
+        const blobs = Array.from({ length: 8 }).map(() => ({
+          x: Math.random(),
+          y: Math.random(),
+          r: 120 + Math.random() * 160,
+          vx: (Math.random() * 0.6 - 0.3) * 0.0007,
+          vy: (Math.random() * 0.6 - 0.3) * 0.0007,
+          color: palette[Math.floor(Math.random() * palette.length)],
+        }));
+
+        let dpr = window.devicePixelRatio || 1;
+        const resize = () => {
+          dpr = window.devicePixelRatio || 1;
+          canvas.width = innerWidth * dpr;
+          canvas.height = innerHeight * dpr;
+          canvas.style.width = "100%";
+          canvas.style.height = "100%";
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+        resize();
+        window.addEventListener("resize", resize, { passive: true });
+
+        const tick = () => {
+          ctx.clearRect(0, 0, innerWidth, innerHeight);
+          blobs.forEach((b, i) => {
+            b.x += b.vx;
+            b.y += b.vy;
+            if (b.x < 0 || b.x > 1) b.vx *= -1;
+            if (b.y < 0 || b.y > 1) b.vy *= -1;
+            const cx = b.x * innerWidth;
+            const cy = b.y * innerHeight;
+            const grad = ctx.createRadialGradient(
+              cx,
+              cy,
+              b.r * 0.15,
+              cx,
+              cy,
+              b.r
+            );
+            grad.addColorStop(0, `${b.color}dd`);
+            grad.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.globalCompositeOperation = i % 2 === 0 ? "screen" : "lighter";
+            ctx.beginPath();
+            ctx.fillStyle = grad;
+            ctx.arc(cx, cy, b.r, 0, Math.PI * 2);
+            ctx.fill();
+          });
+          ctx.globalCompositeOperation = "source-over";
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+
+      startBlobBackground();
+
       const rootEl = document.getElementById("root");
+
+      async function loadHook() {
+        const attempts = ["../dist/index.js", "../dist/reactGlass.js"];
+        for (const path of attempts) {
+          try {
+            const mod = await import(path);
+            if (mod.useReactGlass) return mod.useReactGlass;
+          } catch (e) {
+            // ignore and try next
+          }
+        }
+        throw new Error("useReactGlass export missing from dist build");
+      }
 
       let useReactGlass;
       try {
-        ({ useReactGlass } = await import("../dist/reactGlass.js"));
+        useReactGlass = await loadHook();
       } catch (err) {
-        console.error(
-          "Could not load reactGlass build. Run `npm install && npm run build` in /reactGlass to generate dist/",
-          err
-        );
+        console.error("Could not load reactGlass build.", err);
         rootEl.innerHTML =
-          "<p style='color:#e2e8f0;font-family:system-ui,sans-serif'>Build reactGlass first: <code>cd reactGlass && npm install && npm run build</code></p>";
+          "<p style='color:#e2e8f0;font-family:system-ui,sans-serif'>Build reactGlass first: <code>cd reactGlass && npm install && npm run build</code>. Ensure you are serving from the <code>reactGlass</code> folder so <code>dist/</code> is reachable.</p>";
         throw err;
       }
 
@@ -124,6 +218,17 @@
           })
         )
       );
+
+      // If capture fails for any reason, force content visible after a short delay.
+      setTimeout(() => {
+        document.querySelectorAll(".glass-block").forEach((el) => {
+          const opacity = parseFloat(getComputedStyle(el).opacity || "0");
+          if (opacity < 0.01) {
+            el.style.opacity = "1";
+            el.style.pointerEvents = "auto";
+          }
+        });
+      }, 1200);
     </script>
   </body>
 </html>
