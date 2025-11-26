@@ -1,6 +1,6 @@
 # reactGlass (TypeScript + React)
 
-A React-friendly TypeScript port of the original `liquidGL` WebGL glass shader. It exposes the same options with typed helpers plus a small React component and hook.
+A React-friendly TypeScript glass WebGL shader. It exposes the same options with typed helpers plus a small React component and hook.
 
 ## Building
 
@@ -16,7 +16,7 @@ Build output is emitted to `dist/` with ESM and type declarations.
 After building, open either of the static demo pages in `demos/` with a simple file server:
 
 - `demos/component-demo.html` – uses the `ReactGlass` component with different presets.
-- `demos/hook-demo.html` – shows `useLiquidGL` in a grid of feature blocks.
+- `demos/hook-demo.html` – shows `useReactGlass` in a grid of feature blocks.
 
 ## Usage
 
@@ -41,10 +41,10 @@ export function HeroCard() {
 ### Hook
 
 ```tsx
-import { useLiquidGL } from "reactGlass";
+import { useReactGlass } from "reactGlass";
 
 export function GlassBlock() {
-  const ref = useLiquidGL(
+  const ref = useReactGlass(
     { bevelWidth: 0.18, frost: 2, tilt: true },
     [] // optionally pass a dependency list to control re-initialisation
   );
@@ -57,16 +57,16 @@ export function GlassBlock() {
 }
 ```
 
-> Tip: memoise your `options` object or pass a custom `deps` array to `useLiquidGL` if you want to avoid re-initialising on every render.
+> Tip: memoise your `options` object or pass a custom `deps` array to `useReactGlass` if you want to avoid re-initialising on every render.
 
 ### Direct API
 
 You can also call the underlying function directly if you need fine-grained control:
 
 ```ts
-import { liquidGL, registerDynamic, syncWith } from "reactGlass";
+import { reactGlass, registerDynamic, syncWith } from "reactGlass";
 
-liquidGL({ target: ".glass", tilt: true, magnify: 1.1 });
+reactGlass({ target: ".glass", tilt: true, magnify: 1.1 });
 registerDynamic(".animated-text");
 syncWith();
 ```

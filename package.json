@@ -1,7 +1,7 @@
 {
   "name": "reactGlass",
   "version": "0.0.1",
-  "description": "React + TypeScript port of the liquidGL glassmorphism WebGL shader",
+  "description": "React + TypeScript glassmorphism WebGL shader for React",
   "license": "MIT",
   "private": true,
   "type": "module",

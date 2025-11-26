@@ -73,9 +73,9 @@
 
       const rootEl = document.getElementById("root");
 
-      let useLiquidGL;
+      let useReactGlass;
       try {
-        ({ useLiquidGL } = await import("../dist/index.js"));
+        ({ useReactGlass } = await import("../dist/index.js"));
       } catch (err) {
         console.error(
           "Could not load reactGlass build. Run `npm install && npm run build` in /reactGlass to generate dist/",
@@ -87,7 +87,7 @@
       }
 
       function FeatureBlock({ title, copy, options }) {
-        const ref = useLiquidGL(options, [options]);
+        const ref = useReactGlass(options, [options]);
         return (
           <div ref={ref} className="glass-block">
             <div className="badge">Hook</div>

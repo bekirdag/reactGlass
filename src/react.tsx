@@ -8,10 +8,10 @@ import {
   type MutableRefObject,
 } from "react";
 import {
-  liquidGL,
-  type LiquidGLInstance,
-  type LiquidGLOptions,
-} from "./liquidGL";
+  reactGlass,
+  type ReactGlassInstance,
+  type ReactGlassOptions,
+} from "./reactGlass";
 
 function destroyInstance(instance: any) {
   if (!instance) return;
@@ -24,8 +24,8 @@ function destroyInstance(instance: any) {
   }
 }
 
-export function useLiquidGL(
-  options: Partial<LiquidGLOptions> = {},
+export function useReactGlass(
+  options: Partial<ReactGlassOptions> = {},
   deps: DependencyList = []
 ) {
   const targetRef = useRef<HTMLElement | null>(null);
@@ -35,10 +35,10 @@ export function useLiquidGL(
     const el = targetRef.current;
     if (!el) return;
 
-    const instance = liquidGL({
+    const instance = reactGlass({
       ...options,
       target: el,
-    }) as LiquidGLInstance;
+    }) as ReactGlassInstance;
 
     return () => {
       destroyInstance(instance);
@@ -50,13 +50,13 @@ export function useLiquidGL(
 
 export interface ReactGlassProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "ref"> {
-  options?: Partial<LiquidGLOptions>;
+  options?: Partial<ReactGlassOptions>;
   deps?: DependencyList;
 }
 
 export const ReactGlass = forwardRef<HTMLDivElement, ReactGlassProps>(
   ({ options = {}, deps = [], children, ...rest }, forwardedRef) => {
-    const innerRef = useLiquidGL(options, deps);
+    const innerRef = useReactGlass(options, deps);
 
     const composedRef = useCallback(
       (node: HTMLDivElement | null) => {

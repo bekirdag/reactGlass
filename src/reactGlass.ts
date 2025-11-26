@@ -1,6 +1,6 @@
 // @ts-nocheck
 /*
- * liquidGL – Ultra-light glassmorphism for the web
+ * reactGlass – Ultra-light glassmorphism for the web
  * -----------------------------------------------------------------------------
  *
  * Author: NaughtyDuk© – https://liquidgl.naughtyduk.com
@@ -9,15 +9,15 @@
 
 "use strict";
 
-export type LiquidGLTarget = string | Element | Element[] | NodeListOf<Element>;
-export type LiquidGLRevealMode = "none" | "fade";
+export type ReactGlassTarget = string | Element | Element[] | NodeListOf<Element>;
+export type ReactGlassRevealMode = "none" | "fade";
 
-export interface LiquidGLCallbacks {
-  init?: (instance: LiquidGLLens) => void;
+export interface ReactGlassCallbacks {
+  init?: (instance: ReactGlassLens) => void;
 }
 
-export interface LiquidGLOptions {
-  target: LiquidGLTarget;
+export interface ReactGlassOptions {
+  target: ReactGlassTarget;
   snapshot: string;
   resolution: number;
   refraction: number;
@@ -26,28 +26,28 @@ export interface LiquidGLOptions {
   frost: number;
   shadow: boolean;
   specular: boolean;
-  reveal: LiquidGLRevealMode;
+  reveal: ReactGlassRevealMode;
   tilt: boolean;
   tiltFactor: number;
   magnify: number;
-  on?: LiquidGLCallbacks;
+  on?: ReactGlassCallbacks;
 }
 
-export interface LiquidGLSyncConfig {
+export interface ReactGlassSyncConfig {
   lenis?: any;
   locomotiveScroll?: any;
   gsap?: boolean;
 }
 
-export type LiquidGLInstance =
-  | LiquidGLLens
-  | LiquidGLLens[]
+export type ReactGlassInstance =
+  | ReactGlassLens
+  | ReactGlassLens[]
   | Element
   | Element[]
   | undefined;
 
-const DEFAULT_OPTIONS: LiquidGLOptions = {
-  target: ".liquidGL",
+const DEFAULT_OPTIONS: ReactGlassOptions = {
+  target: ".reactGlass",
   snapshot: "body",
   resolution: 2.0,
   refraction: 0.01,
@@ -63,7 +63,7 @@ const DEFAULT_OPTIONS: LiquidGLOptions = {
   on: {},
 };
 
-let rendererSingleton: LiquidGLRenderer | null = null;
+let rendererSingleton: ReactGlassRenderer | null = null;
 let cachedNoWebGL: boolean | undefined;
 
 /* --------------------------------------------------
@@ -93,7 +93,7 @@ function effectiveZ(el) {
   return 0;
 }
 
-function resolveTargets(target: LiquidGLTarget) {
+function resolveTargets(target: ReactGlassTarget) {
   if (!target) return [];
   if (typeof target === "string") {
     return Array.from(document.querySelectorAll(target));
@@ -150,7 +150,7 @@ function createProgram(gl, vsSource, fsSource) {
 /* --------------------------------------------------
  *  Shared renderer (one per page)
  * ------------------------------------------------*/
-export class LiquidGLRenderer {
+export class ReactGlassRenderer {
   constructor(snapshotSelector, snapshotResolution = 1.0) {
     this.canvas = document.createElement("canvas");
     this.canvas.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;`;
@@ -166,7 +166,7 @@ export class LiquidGLRenderer {
       this.canvas.getContext("webgl2", ctxAttribs) ||
       this.canvas.getContext("webgl", ctxAttribs) ||
       this.canvas.getContext("experimental-webgl", ctxAttribs);
-    if (!this.gl) throw new Error("liquidGL: WebGL unavailable");
+    if (!this.gl) throw new Error("reactGlass: WebGL unavailable");
 
     this.lenses = [];
     this.texture = null;
@@ -442,7 +442,7 @@ export class LiquidGLRenderer {
 
     this.program = createProgram(this.gl, vsSource, fsSource);
     const gl = this.gl;
-    if (!this.program) throw new Error("liquidGL: Shader failed");
+    if (!this.program) throw new Error("reactGlass: Shader failed");
 
     const posBuf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
@@ -558,7 +558,7 @@ export class LiquidGLRenderer {
         this._uploadTexture(snapCanvas);
         return true;
       } catch (e) {
-        console.error("liquidGL snapshot failed on attempt " + attempt, e);
+        console.error("reactGlass snapshot failed on attempt " + attempt, e);
         if (attempt < maxAttempts) {
           console.log(
             `Retrying snapshot capture (${attempt + 1}/${maxAttempts})...`
@@ -566,7 +566,7 @@ export class LiquidGLRenderer {
           await new Promise((resolve) => setTimeout(resolve, delayMs));
           return await attemptCapture(attempt + 1, maxAttempts, delayMs);
         } else {
-          console.error("liquidGL: All snapshot attempts failed.", e);
+          console.error("reactGlass: All snapshot attempts failed.", e);
           return false;
         }
       } finally {
@@ -595,7 +595,7 @@ export class LiquidGLRenderer {
         srcCanvas = tmp;
       } catch (e) {
         console.warn(
-          "liquidGL: Unable to convert OffscreenCanvas for upload",
+          "reactGlass: Unable to convert OffscreenCanvas for upload",
           e
         );
         return;
@@ -634,7 +634,7 @@ export class LiquidGLRenderer {
 
   /* ----------------------------- */
   addLens(element, options) {
-    const lens = new LiquidGLLens(this, element, options);
+    const lens = new ReactGlassLens(this, element, options);
     this.lenses.push(lens);
 
     const maxZ = this._getMaxLensZ();
@@ -897,7 +897,7 @@ export class LiquidGLRenderer {
         this._tmpCtx.drawImage(vid, 0, 0, drawW, drawH);
         this._tmpCtx.restore();
       } catch (e) {
-        console.warn("liquidGL: Error drawing video frame", e);
+        console.warn("reactGlass: Error drawing video frame", e);
         return;
       }
 
@@ -1021,7 +1021,7 @@ export class LiquidGLRenderer {
             }
           })
           .catch((e) => {
-            console.error("liquidGL: Dynamic element capture failed.", e);
+            console.error("reactGlass: Dynamic element capture failed.", e);
           })
           .finally(() => {
             meta._capturing = false;
@@ -1319,7 +1319,7 @@ export class LiquidGLRenderer {
             m.hoverClassName = className;
             el.classList.add(className);
           } catch (e) {
-            console.error("liquidGL: Failed to insert hover style rule.", e);
+            console.error("reactGlass: Failed to insert hover style rule.", e);
           }
         }
         setDirty();
@@ -1456,7 +1456,7 @@ export class LiquidGLRenderer {
 /* --------------------------------------------------
  *  Per-element lens wrapper
  * ------------------------------------------------*/
-export class LiquidGLLens {
+export class ReactGlassLens {
   constructor(renderer, element, options) {
     this.renderer = renderer;
     this.el = element;
@@ -2064,15 +2064,15 @@ export class LiquidGLLens {
  *  Public API
  * ------------------------------------------------*/
 
-export function liquidGL(userOptions: Partial<LiquidGLOptions> = {}) {
+export function reactGlass(userOptions: Partial<ReactGlassOptions> = {}) {
   if (!hasDOM()) {
     console.warn(
-      "liquidGL: window/document not available (likely SSR). Skipping init."
+      "reactGlass: window/document not available (likely SSR). Skipping init."
     );
     return;
   }
 
-  const options: LiquidGLOptions = { ...DEFAULT_OPTIONS, ...userOptions };
+  const options: ReactGlassOptions = { ...DEFAULT_OPTIONS, ...userOptions };
 
   if (typeof cachedNoWebGL === "undefined") {
     const testCanvas = document.createElement("canvas");
@@ -2085,7 +2085,7 @@ export function liquidGL(userOptions: Partial<LiquidGLOptions> = {}) {
 
   if (cachedNoWebGL) {
     console.warn(
-      "liquidGL: WebGL not available – falling back to CSS backdrop-filter."
+      "reactGlass: WebGL not available – falling back to CSS backdrop-filter."
     );
     const fallbackNodes = resolveTargets(options.target);
     fallbackNodes.forEach((node) => {
@@ -2099,7 +2099,7 @@ export function liquidGL(userOptions: Partial<LiquidGLOptions> = {}) {
   }
 
   if (!rendererSingleton) {
-    rendererSingleton = new LiquidGLRenderer(
+    rendererSingleton = new ReactGlassRenderer(
       options.snapshot,
       options.resolution
     );
@@ -2110,7 +2110,7 @@ export function liquidGL(userOptions: Partial<LiquidGLOptions> = {}) {
   if (!targets || targets.length === 0) {
     const targetDesc =
       typeof options.target === "string" ? options.target : "[custom target]";
-    console.warn(`liquidGL: Target element(s) '${targetDesc}' not found.`);
+    console.warn(`reactGlass: Target element(s) '${targetDesc}' not found.`);
     return;
   }
 
@@ -2142,12 +2142,12 @@ export function registerDynamic(elements) {
 /* --------------------------------------------------
  *  Public helper: Universal smooth scroll / animation sync
  * ------------------------------------------------*/
-export function syncWith(config: LiquidGLSyncConfig = {}) {
+export function syncWith(config: ReactGlassSyncConfig = {}) {
   if (!hasDOM()) return;
   const renderer = rendererSingleton;
   if (!renderer) {
     console.warn(
-      "liquidGL: Please initialize liquidGL *before* calling syncWith()."
+      "reactGlass: Please initialize reactGlass *before* calling syncWith()."
     );
     return;
   }

@@ -1,15 +1,15 @@
 export {
-  liquidGL,
+  reactGlass,
   registerDynamic,
   syncWith,
-  LiquidGLRenderer,
-  LiquidGLLens,
-  type LiquidGLOptions,
-  type LiquidGLCallbacks,
-  type LiquidGLSyncConfig,
-  type LiquidGLRevealMode,
-  type LiquidGLTarget,
-  type LiquidGLInstance,
-} from "./liquidGL";
+  ReactGlassRenderer,
+  ReactGlassLens,
+  type ReactGlassOptions,
+  type ReactGlassCallbacks,
+  type ReactGlassSyncConfig,
+  type ReactGlassRevealMode,
+  type ReactGlassTarget,
+  type ReactGlassInstance,
+} from "./reactGlass";
 
-export { ReactGlass, useLiquidGL, type ReactGlassProps } from "./react";
+export { ReactGlass, useReactGlass, type ReactGlassProps } from "./react";
