@@ -12,4 +12,4 @@ export {
   type LiquidGLInstance,
 } from "./liquidGL";
 
-export { LiquidGlass, useLiquidGL, type LiquidGlassProps } from "./react";
+export { ReactGlass, useLiquidGL, type ReactGlassProps } from "./react";

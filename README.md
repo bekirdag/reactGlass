@@ -15,7 +15,7 @@ Build output is emitted to `dist/` with ESM and type declarations.
 
 After building, open either of the static demo pages in `demos/` with a simple file server:
 
-- `demos/component-demo.html` – uses the `LiquidGlass` component with different presets.
+- `demos/component-demo.html` – uses the `ReactGlass` component with different presets.
 - `demos/hook-demo.html` – shows `useLiquidGL` in a grid of feature blocks.
 
 ## Usage
@@ -23,17 +23,17 @@ After building, open either of the static demo pages in `demos/` with a simple f
 ### Component
 
 ```tsx
-import { LiquidGlass } from "reactGlass";
+import { ReactGlass } from "reactGlass";
 
 export function HeroCard() {
   return (
-    <LiquidGlass
+    <ReactGlass
       className="glass-pane"
       options={{ refraction: 0.02, bevelDepth: 0.12, tilt: true }}
     >
       <h2>Liquid Glass</h2>
       <p>Bring refractive glass to any React element.</p>
-    </LiquidGlass>
+    </ReactGlass>
   );
 }
 ```

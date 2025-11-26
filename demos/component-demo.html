@@ -70,15 +70,15 @@
     <script type="module">
       import React from "https://esm.sh/react@18";
       import { createRoot } from "https://esm.sh/react-dom@18/client";
-      import { LiquidGlass } from "../dist/index.js";
+      import { ReactGlass } from "../dist/index.js";
 
       function Card({ title, copy, options }) {
         return (
-          <LiquidGlass className="glass-pane" options={options}>
+          <ReactGlass className="glass-pane" options={options}>
             <div className="pill">reactGlass</div>
             <h2>{title}</h2>
             <p>{copy}</p>
-          </LiquidGlass>
+          </ReactGlass>
         );
       }
 

@@ -48,13 +48,13 @@ export function useLiquidGL(
   return targetRef;
 }
 
-export interface LiquidGlassProps
+export interface ReactGlassProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "ref"> {
   options?: Partial<LiquidGLOptions>;
   deps?: DependencyList;
 }
 
-export const LiquidGlass = forwardRef<HTMLDivElement, LiquidGlassProps>(
+export const ReactGlass = forwardRef<HTMLDivElement, ReactGlassProps>(
   ({ options = {}, deps = [], children, ...rest }, forwardedRef) => {
     const innerRef = useLiquidGL(options, deps);
 
@@ -79,4 +79,4 @@ export const LiquidGlass = forwardRef<HTMLDivElement, LiquidGlassProps>(
   }
 );
 
-LiquidGlass.displayName = "LiquidGlass";
+ReactGlass.displayName = "ReactGlass";
