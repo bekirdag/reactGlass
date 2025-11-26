@@ -70,7 +70,21 @@
     <script type="module">
       import React from "https://esm.sh/react@18";
       import { createRoot } from "https://esm.sh/react-dom@18/client";
-      import { ReactGlass } from "../dist/index.js";
+
+      const rootEl = document.getElementById("root");
+
+      let ReactGlass;
+      try {
+        ({ ReactGlass } = await import("../dist/index.js"));
+      } catch (err) {
+        console.error(
+          "Could not load reactGlass build. Run `npm install && npm run build` in /reactGlass to generate dist/",
+          err
+        );
+        rootEl.innerHTML =
+          "<p style='color:#e2e8f0;font-family:system-ui,sans-serif'>Build reactGlass first: <code>cd reactGlass && npm install && npm run build</code></p>";
+        throw err;
+      }
 
       function Card({ title, copy, options }) {
         return (
@@ -82,7 +96,7 @@
         );
       }
 
-      const root = createRoot(document.getElementById("root"));
+      const root = createRoot(rootEl);
       root.render(
         <div className="grid">
           <Card
