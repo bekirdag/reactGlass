@@ -6,7 +6,7 @@ A React-friendly TypeScript glass WebGL shader. It exposes the same options with
 
 ```bash
 npm install
-npm run build
+npm run build   # cleans dist then emits fresh bundles
 ```
 
 Build output is emitted to `dist/` with ESM and type declarations.
